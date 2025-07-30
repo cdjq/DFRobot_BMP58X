@@ -1,0 +1,151 @@
+#######################################
+# Syntax Map For DFRobot_BMP58X
+#######################################
+
+#######################################
+# Datatypes (KEYWORD1)
+#######################################
+
+DFRobot_BMP58X	KEYWORD1
+DFRobot_BMP58X_I2C KEYWORD1
+DFRobot_BMP58X_SPI KEYWORD1
+DFRobot_BMP58X_UART KEYWORD1
+
+#######################################
+# Methods and Functions (KEYWORD2)
+#######################################
+
+begin	KEYWORD2
+setODR	KEYWORD2
+setOSR	KEYWORD2
+setMeasureMode	KEYWORD2
+reset	KEYWORD2
+readTempC	KEYWORD2
+readPressPa	KEYWORD2
+readAltitudeM KEYWORD2
+configIIR KEYWORD2
+configFIFO KEYWORD2
+getFIFOCount KEYWORD2
+getFIFOData KEYWORD2
+configInterrupt KEYWORD2
+setIntSource KEYWORD2
+getIntStatus KEYWORD2
+setOORPress KEYWORD2
+calibratedAbsoluteDifference KEYWORD2
+
+#######################################
+# Instances (KEYWORD2)
+#######################################
+
+
+#######################################
+# Constants (LITERAL1)
+#######################################
+
+eIntDataReady LITERAL1
+eIntFIFOFull LITERAL1
+eIntFIFOThres LITERAL1
+eIntPressureOor LITERAL1
+
+eIntDisable LITERAL1
+eIntEnable LITERAL1
+
+eIntPushPull LITERAL1
+eIntOpenDrain LITERAL1
+
+eIntLowActive LITERAL1
+eIntHighActive LITERAL1
+
+eIntModePulsed LITERAL1
+eIntModeLatched LITERAL1
+
+eIntStatusDataReady LITERAL1
+eIntStatusFIFOFull LITERAL1
+eIntStatusFIFOThres LITERAL1
+eIntStatusPressureOor LITERAL1
+eIntStatusResetComplete LITERAL1
+
+eFIFOOverwriteMode LITERAL1
+eFIFOFullStopMode LITERAL1
+
+eNoDownSampling LITERAL1
+eDownSampling2 LITERAL1
+eDownSampling4 LITERAL1
+eDownSampling8 LITERAL1
+eDownSampling16 LITERAL1
+eDownSampling32 LITERAL1
+eDownSampling64 LITERAL1
+eDownSampling128 LITERAL1
+
+eFIFODisable LITERAL1
+eFIFOTempData LITERAL1
+eFIFOPressData LITERAL1
+eFIFOPressAndTempData LITERAL1
+
+eSleep LITERAL1
+eNormal LITERAL1
+eSingleShot LITERAL1
+eContinuous LITERAL1
+eDeepSleep LITERAL1
+
+eOORCountLimit1 LITERAL1
+eOORCountLimit3 LITERAL1
+eOORCountLimit7 LITERAL1
+eOORCountLimit15 LITERAL1
+
+eFilterBypass LITERAL1
+eFilter1 LITERAL1
+eFilter3 LITERAL1
+eFilter7 LITERAL1
+eFilter15 LITERAL1
+eFilter31 LITERAL1
+eFilter63 LITERAL1
+eFilter127 LITERAL1
+
+eOverSampling1 LITERAL1
+eOverSampling2 LITERAL1
+eOverSampling4 LITERAL1
+eOverSampling8 LITERAL1
+eOverSampling16 LITERAL1
+eOverSampling32 LITERAL1
+eOverSampling64 LITERAL1
+eOverSampling128 LITERAL1
+
+eOdr240Hz LITERAL1
+eOdr218_5Hz LITERAL1
+eOdr199_1Hz LITERAL1
+eOdr179_2Hz LITERAL1
+eOdr160Hz LITERAL1
+eOdr149_3Hz LITERAL1
+eOdr140Hz LITERAL1
+eOdr129_8Hz LITERAL1
+eOdr120Hz LITERAL1
+eOdr110_1Hz LITERAL1
+eOdr100_2Hz LITERAL1
+eOdr89_6Hz LITERAL1
+eOdr80Hz LITERAL1
+eOdr70Hz LITERAL1
+eOdr60Hz LITERAL1
+eOdr50Hz LITERAL1
+eOdr45Hz LITERAL1
+eOdr40Hz LITERAL1
+eOdr35Hz LITERAL1
+eOdr30Hz LITERAL1
+eOdr25Hz LITERAL1
+eOdr20Hz LITERAL1
+eOdr15Hz LITERAL1
+eOdr10Hz LITERAL1
+eOdr5Hz LITERAL1
+eOdr4Hz LITERAL1
+eOdr3Hz LITERAL1
+eOdr2Hz LITERAL1
+eOdr1Hz LITERAL1
+eOdr0_5Hz LITERAL1
+eOdr0_250Hz LITERAL1
+eOdr0_125Hz LITERAL1
+
+eDeepEnable LITERAL1
+eDeepDisable LITERAL1
+
+eDisable LITERAL1
+eEnable LITERAL1

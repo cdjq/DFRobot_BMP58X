@@ -1,0 +1,78 @@
+# -*- coding: utf-8 -*
+'''!
+  @file  get_temp_press.py
+  @brief  Get the temperature and pressure data of the BMP58X
+  @details  The temperature and pressure data of the BMP58X is obtained by calling the get_temperature() and get_pressure() functions respectively.
+  @n  The altitude data is obtained by calling the get_altitude() function.
+  @copyright   Copyright (c) 2025 DFRobot Co.Ltd (http://www.dfrobot.com)
+  @license     The MIT License (MIT)
+  @author      yuanlong.yu(yuanlong.yu@dfrobot.com)
+  @version     V1.0.0
+  @date        2025-06-06
+  @url         https://github.com/DFRobot/DFRobot_BMP58X
+'''
+import os
+import sys
+import time
+
+sys.path.append(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
+from DFRobot_BMP58X import *
+
+DEV_ADDR   = 0x47
+
+# mode = "UART"
+# mode = "SPI"
+mode = "I2C"
+
+#If there is no need to eliminate the absolute measurement difference, please set it to False
+CALIBRATE_ABSOLUTE_DIFFERENCE = True
+
+if mode == "I2C":
+    I2C_BUS    = 0x01
+    bmp5 = DFRobot_BMP58X_I2C(I2C_BUS, DEV_ADDR)
+elif mode == "SPI":
+    CS         = 8
+    bmp5 = DFRobot_BMP58X_SPI(cs=CS, bus=0, dev=0, speed=8000000)
+elif mode == "UART":
+    bmp5 = DFRobot_BMP58X_UART(9600, DEV_ADDR)
+
+def setup():
+    while not bmp5.begin():
+        print("sensor init error ,please check connect!")
+        time.sleep(1)
+
+    '''!
+      # Calibrate the sensor according to the current altitude
+      # In this example, we use an altitude of 540 meters in Wenjiang District of Chengdu (China). Please change to the local altitude when using it.
+      # If this interface is not called, the measurement data will not eliminate the absolute difference
+      # Notice: This interface is only valid for the first call
+      # If you do not need to eliminate the absolute difference of measurement, please comment the following line
+    '''
+    if CALIBRATE_ABSOLUTE_DIFFERENCE:
+        bmp5.calibrated_absolute_difference(540.0)
+
+    '''!
+        @brief  set the measurement mode of the sensor
+        @param  mode: measurement mode
+        @n      SLEEP_MODE = 0x00.        #// standby mode
+        @n      NORMAL_MODE = 0x01.        #// normal mode
+        @n      SINGLE_SHOT_MODE = 0x02.         #// forced mode > only perform once
+        @n      CONTINOUS_MODE = 0x03.      #// continuous mode
+        @n      DEEP_SLEEP_MODE = 0x04.   #// deep standby mode
+    '''
+    bmp5.set_measure_mode(bmp5.NORMAL_MODE)
+
+def loop():
+    print("temperature : %.2f (C)" % (bmp5.read_temperature()))
+
+    print("Pressure : %.2f (Pa)" % (bmp5.read_pressure()))
+
+    print("Altitude : %.2f (M)" % (bmp5.read_altitude()))
+    
+    print()
+    time.sleep(0.5)
+
+if __name__ == "__main__":
+    setup()
+    while True:
+        loop()
