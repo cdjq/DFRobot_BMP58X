@@ -10,12 +10,11 @@
  * @license    The MIT License (MIT)
  * @author     yuanlong.yu(yuanlong.yu@dfrobot.com)
  * @version    V1.0.0
- * @date       2025-06-06
+ * @date       2025-09-17
  * @url        https://github.com/DFRobot/DFRobot_BMP58X
 */
 
 #include "DFRobot_BMP58X.h"
-#include "DFRobot_RTU.h"
 
 /* >> 1.Please choose your communication method below: */
 // #define BMP5_COMM_UART
@@ -27,7 +26,7 @@
 
 /**
  * >> 3.Configure the interrupt mode you need to use: Opening the macro below is a latch interrupt,
- * otherwise it is a pulse interrupt。
+ * otherwise it is a pulse interrupt。Latched interrupts must read the interrupt status register before new interrupts can be generated.
 */
 // #define BMP5_INT_MODE_LATCHED
 
@@ -44,29 +43,30 @@ const uint8_t ADDR = 0x47;
  *    board   |             MCU                | Leonardo/Mega2560/M0 |    UNO    | ESP8266 | ESP32 |  microbit  |   m0  |
  *     VCC    |            3.3V/5V             |        VCC           |    VCC    |   VCC   |  VCC  |     X      |  vcc  |
  *     GND    |              GND               |        GND           |    GND    |   GND   |  GND  |     X      |  gnd  |
- *     RX     |              TX                |     Serial1 TX1      |     5     |   5/D6  |  D2   |     X      |  tx1  |
- *     TX     |              RX                |     Serial1 RX1      |     4     |   4/D7  |  D3   |     X      |  rx1  |
+ *     RX     |              TX                |     Serial1 TX1      |     5     |   5/D6  |  26/D3|     X      |  tx1  |
+ *     TX     |              RX                |     Serial1 RX1      |     4     |   4/D7  |  25/D2|     X      |  rx1  |
  * ----------------------------------------------------------------------------------------------------------------------*/
 #if defined(ARDUINO_AVR_UNO) || defined(ESP8266)
-#include <SoftwareSerial.h>
+  #include <SoftwareSerial.h>
 #endif
 #if defined(ARDUINO_AVR_UNO) || defined(ESP8266)
-SoftwareSerial mySerial(/*rx =*/4, /*tx =*/5);
-DFRobot_BMP58X_UART bmp58x(&mySerial, 9600, ADDR);
+  SoftwareSerial mySerial(/*rx =*/4, /*tx =*/5);
+  DFRobot_BMP58X_UART bmp58x(&mySerial, 9600, ADDR);
 #elif defined(ESP32)
-DFRobot_BMP58X_UART bmp58x(&Serial1, 9600, ADDR, /*rx*/ D2, /*tx*/ D3);
+  DFRobot_BMP58X_UART bmp58x(&Serial1, 9600, ADDR, /*rx D2*/ 25 , /*tx D3*/ 26);
 #else
-DFRobot_BMP58X_UART bmp58x(&Serial1, 9600, ADDR);
+  DFRobot_BMP58X_UART bmp58x(&Serial1, 9600, ADDR);
 #endif
 #elif defined(BMP5_COMM_I2C)
-DFRobot_BMP58X_I2C bmp58x(&Wire, ADDR);
+  DFRobot_BMP58X_I2C bmp58x(&Wire, ADDR);
 #elif defined(BMP5_COMM_SPI)
-/**
- * Note: The chip select (CS) pin used here is the digital pin D3 on the ESP32 board. You may also choose another 
- * non-conflicting GPIO pin as the external interrupt pin.
- */
-uint8_t csPin = D3;
-DFRobot_BMP58X_SPI bmp58x(&SPI, csPin);
+  #if defined(ESP32)
+    DFRobot_BMP58X_SPI bmp58x(&SPI, 26 /*D3*/);
+  #elif defined(ARDUINO_BBC_MICROBIT_V2)
+    DFRobot_BMP58X_SPI bmp58x(&SPI, 16);
+  #else 
+    DFRobot_BMP58X_SPI bmp58x(&SPI, 5);
+  #endif
 #else
 #error
 #endif
@@ -79,7 +79,7 @@ void interrupt() {
 }
 
 void setup() {
-  Serial.begin(9600);
+  Serial.begin(115200);
   Serial.println("Start..");
   while (!bmp58x.begin()) {
     Serial.println("Sensor init fail!");
@@ -166,7 +166,7 @@ void setup() {
    * @n - eIntDataReady:    Data ready interrupt
    * @n - eIntFIFOFull:    FIFO full interrupt
    * @n - eIntFIFOThres:   FIFO threshold interrupt
-   * @n - eIntPressureOor: Pressure out-of-range interrupt
+   * @n - eIntPressureOOR: Pressure out-of-range interrupt
    */
   bmp58x.setIntSource(bmp58x.eIntDataReady);
 
@@ -179,20 +179,6 @@ void setup() {
    */
     bmp58x.calibratedAbsoluteDifference(540.0);
   #endif
-
-  /**
-   * @param mode Operation mode (see: eMeasureMode_t)
-   * @n Available modes:
-   * @n - eSleep:         Sleep mode
-   * @n - eNormal:        Normal measurement mode
-   * @n - eSingleShot:    Single-shot measurement
-   * @n - eContinuous:    Continuous measurement
-   * @n - eDeepSleep:     Deep Sleep mode
-   */
-  bmp58x.setMeasureMode(bmp58x.eNormal);
-
-  // bmp58x.setMeasureMode(bmp58x.eContinuous);
-
 
 #if defined(ESP32) || defined(ESP8266)
   // D6 pin is used as interrupt pin by default, other non-conflicting pins can also be selected as external interrupt pins.
@@ -226,20 +212,28 @@ void setup() {
   attachInterrupt(/*Interrupt No*/ 0, interrupt, RISING);  // Open the external interrupt 0, connect INT1/2 to the digital pin of the main control:
                                                            // UNO(2), Mega2560(2), Leonardo(3), microbit(P0).
 #endif
-  
+  /**
+   * @param mode Operation mode (see: eMeasureMode_t)
+   * @n Available modes:
+   * @n - eSleep:         Sleep mode
+   * @n - eNormal:        Normal measurement mode
+   * @n - eSingleShot:    Single-shot measurement
+   * @n - eContinuous:    Continuous measurement
+   * @n - eDeepSleep:     Deep Sleep mode
+   */
+  bmp58x.setMeasureMode(bmp58x.eNormal);
 }
 void loop() {
-#if defined(BMP5_INT_MODE_LATCHED)
-  bmp58x.getIntStatus(); // Latched interrupts must read the interrupt status register before new interrupts can be generated.
-#endif
   if (flag == 1) {
     flag = 0;
-    Serial.print("temp: ");
-    Serial.print(bmp58x.readTempC());
-    Serial.print(" (C)  press: ");
-    Serial.print(bmp58x.readPressPa());
-    Serial.print(" (Pa)  alt: ");
-    Serial.print(bmp58x.readAltitudeM());
-    Serial.println(" (M)");
+    if (bmp58x.getIntStatus() & bmp58x.eIntDataReady){
+      Serial.print("temp: ");
+      Serial.print(bmp58x.readTempC());
+      Serial.print(" (C)  press: ");
+      Serial.print(bmp58x.readPressPa());
+      Serial.print(" (Pa)  alt: ");
+      Serial.print(bmp58x.readAltitudeM());
+      Serial.println(" (M)");
+    }
   }
 }

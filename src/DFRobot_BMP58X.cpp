@@ -1,16 +1,11 @@
 /**
  * @file  DFRobot_BMP58X.cpp
  * @brief  Define the infrastructure of DFRobot_BMP58X class
- * @n      This is a pressure and temperature sensor that can be controlled
- * through I2C/SPI/UART ports.
- * @n      BMP (581/585) has functions such as temperature compensation, data
- * oversampling, IIR filtering, etc
- * @n      These features improve the accuracy of data collected by BMP
- * (581/585) sensors.
- * @n      BMP (581/585) also has a FIFO data buffer, greatly improving its
- * availability.
- * @n      Similarly, BMP (581/585) has an interrupt pin that can be used in an
- * energy-efficient manner without using software algorithms.
+ * @n      This is a pressure and temperature sensor that can be controlled through I2C/SPI/UART ports.
+ * @n      BMP (581/585) has functions such as temperature compensation, data oversampling, IIR filtering, etc
+ * @n      These features improve the accuracy of data collected by BMP(581/585) sensors.
+ * @n      BMP (581/585) also has a FIFO data buffer, greatly improving its availability.
+ * @n      Similarly, BMP (581/585) has an interrupt pin that can be used in an energy-efficient manner without using software algorithms.
  * @copyright   Copyright (c) 2025 DFRobot Co.Ltd (http://www.dfrobot.com)
  * @license     The MIT License (MIT)
  * @author      yuanlong.yu(yuanlong.yu@dfrobot.com)
@@ -20,8 +15,6 @@
  */
 
 #include "DFRobot_BMP58X.h"
-#include "Arduino.h"
-#include "SPI.h"
 
 DFRobot_BMP58X::DFRobot_BMP58X() {}
 
@@ -93,10 +86,11 @@ uint8_t DFRobot_BMP58X::reset(void) {
   writeHoldingReg(REG_H_CMD, &data, 1);
   delayMicroseconds(2000);
 
-  readInputReg(REG_I_CHIP_ID, &data, 1);
+  readInputReg(REG_I_CHIP_ID, &data, 1); //< Resetting in SPI communication mode is necessary to restore communication.
 
   uint16_t intStatus = getIntStatus();
   if (intStatus & eIntStatusResetComplete) {
+    enablePressure(eEnable);
     return RET_CODE_OK;
   }
   return RET_CODE_ERROR;
@@ -116,10 +110,6 @@ float DFRobot_BMP58X::readPressPa(void) {
   int32_t pressData = ((int32_t)((int8_t)((uint8_t)data[2])) << 16) | ((uint32_t)(data[1]) << 8) | ((uint32_t)data[0]);
   // (MSB LSB XLSB) / 2^6;
   float retData = (float)pressData / 64.0;
-  if (_calibrated) {
-    float seaLevelPressPa = (retData / pow(1.0 - (_sealevelAltitude / 44307.7), 5.255302));
-    retData = retData - seaLevelPressPa + STANDARD_SEA_LEVEL_PRESSURE_PA;
-  }
   return retData;
 }
 
@@ -156,8 +146,7 @@ uint8_t DFRobot_BMP58X::configIIR(eIIRFilter_t iirTemp, eIIRFilter_t iirPress) {
   return RET_CODE_OK;
 }
 
-uint8_t DFRobot_BMP58X::configFIFO(eFIFODataSel_t dataSel, eFIFODownSampling_t downSampling, eFIFOWorkMode_t mode,
-                                   uint8_t threshold) {
+uint8_t DFRobot_BMP58X::configFIFO(eFIFODataSel_t dataSel, eFIFODownSampling_t downSampling, eFIFOWorkMode_t mode, uint8_t threshold) {
   eMeasureMode_t currMode = getPowerMode();
   setMeasureMode(eSleep);
   uint16_t data = 0;
@@ -201,38 +190,26 @@ DFRobot_BMP58X::sFIFOData_t DFRobot_BMP58X::getFIFOData(void) {
     for (uint8_t i = 0; i < count; i++) {
       uint16_t data[3] = {0};
       readInputReg(REG_I_FIFO_DATA, data, 3);
-      int32_t tmpData =
-          ((int32_t)((int8_t)((uint8_t)data[2])) << 16) | ((uint32_t)(data[1]) << 8) | ((uint32_t)data[0]);
+      int32_t tmpData = ((int32_t)((int8_t)((uint8_t)data[2])) << 16) | ((uint32_t)(data[1]) << 8) | ((uint32_t)data[0]);
       fifoData.fifoTempC[i] = (float)tmpData / 65536;
     }
   } else if (fifo_frame_sel == eFIFOPressData) {
     for (uint8_t i = 0; i < count; i++) {
       uint16_t data[3] = {0};
       readInputReg(REG_I_FIFO_DATA, data, 3);
-      int32_t pressData =
-          ((int32_t)((int8_t)((uint8_t)data[2])) << 16) | ((uint32_t)(data[1]) << 8) | ((uint32_t)data[0]);
+      int32_t pressData = ((int32_t)((int8_t)((uint8_t)data[2])) << 16) | ((uint32_t)(data[1]) << 8) | ((uint32_t)data[0]);
       float pressure = (float)pressData / 64.0;
-      if (_calibrated) {
-        float seaLevelPressPa = (pressure / pow(1.0 - (_sealevelAltitude / 44307.7), 5.255302));
-        pressure = pressure - seaLevelPressPa + STANDARD_SEA_LEVEL_PRESSURE_PA;
-      }
       fifoData.fifoPressPa[i] = pressure;
     }
   } else if (fifo_frame_sel == eFIFOPressAndTempData) {
     for (uint8_t i = 0; i < count; i++) {
       uint16_t data[6] = {0};
       readInputReg(REG_I_FIFO_DATA, data, 6);
-      int32_t tmpData =
-          ((int32_t)((int8_t)((uint8_t)data[2])) << 16) | ((uint32_t)(data[1]) << 8) | ((uint32_t)data[0]);
+      int32_t tmpData = ((int32_t)((int8_t)((uint8_t)data[2])) << 16) | ((uint32_t)(data[1]) << 8) | ((uint32_t)data[0]);
       fifoData.fifoTempC[i] = (float)tmpData / 65536;
 
-      int32_t pressData =
-          ((int32_t)((int8_t)((uint8_t)data[5])) << 16) | ((uint32_t)(data[4]) << 8) | ((uint32_t)data[3]);
+      int32_t pressData = ((int32_t)((int8_t)((uint8_t)data[5])) << 16) | ((uint32_t)(data[4]) << 8) | ((uint32_t)data[3]);
       float pressure = (float)pressData / 64.0;
-      if (_calibrated) {
-        float seaLevelPressPa = (pressure / pow(1.0 - (_sealevelAltitude / 44307.7), 5.255302));
-        pressure = pressure - seaLevelPressPa + STANDARD_SEA_LEVEL_PRESSURE_PA;
-      }
       fifoData.fifoPressPa[i] = pressure;
     }
   }
@@ -255,7 +232,7 @@ uint8_t DFRobot_BMP58X::configInterrupt(eIntMode_t mode, eIntPolarity_t pol, eIn
 }
 
 uint8_t DFRobot_BMP58X::setIntSource(uint8_t source) {
-  const uint8_t VALID_INT_MASK = eIntDataReady | eIntFIFOFull | eIntFIFOThres | eIntPressureOor;
+  const uint8_t VALID_INT_MASK = eIntDataReady | eIntFIFOFull | eIntFIFOThres | eIntPressureOOR;
   // source &= VALID_INT_MASK;
   uint16_t data = ((uint8_t)source & VALID_INT_MASK);
   writeHoldingReg(REG_H_INT_SOURCE, &data, 1);
@@ -270,7 +247,7 @@ uint16_t DFRobot_BMP58X::getIntStatus(void) {
   return data;
 }
 
-uint8_t DFRobot_BMP58X::setOORPress(uint32_t oor, uint8_t range, eOORCountLimit_t cntLimit) {
+uint8_t DFRobot_BMP58X::setPressOOR(uint32_t oor, uint8_t range, eOORCountLimit_t cntLimit) {
   eMeasureMode_t currMode = getPowerMode();
   setMeasureMode(eSleep);
 
@@ -365,7 +342,7 @@ DFRobot_BMP58X::eMeasureMode_t DFRobot_BMP58X::verifyDeepSleepMode(void) {
   return mode;
 }
 
-uint8_t DFRobot_BMP58X::setFIFOThreshold(uint16_t *data, eFIFODataSel_t frame_sel, uint8_t threshold){
+uint8_t DFRobot_BMP58X::setFIFOThreshold(uint16_t *data, eFIFODataSel_t frame_sel, uint8_t threshold) {
   uint8_t ret = RET_CODE_ERROR;
   if (frame_sel == eFIFOTempData || frame_sel == eFIFOPressData) {
     if (threshold <= 0x1F) {
@@ -386,17 +363,11 @@ float DFRobot_BMP58X::calculateAltitude(float temperature_c, float pressure_pa) 
   return (1.0 - pow(pressure_pa / 101325, 0.190284)) * 44307.7;
 }
 
-uint8_t DFRobot_BMP58X_I2C::writeHoldingReg(uint8_t reg, void *data, uint8_t len) {
-  return writeReg(reg, data, len) ? RET_CODE_OK : RET_CODE_ERROR;
-}
+uint8_t DFRobot_BMP58X_I2C::writeHoldingReg(uint8_t reg, void *data, uint8_t len) { return writeReg(reg, data, len) ? RET_CODE_OK : RET_CODE_ERROR; }
 
-uint8_t DFRobot_BMP58X_I2C::readHoldingReg(uint8_t reg, void *data, uint8_t len) {
-  return readReg(reg, data, len) ? RET_CODE_OK : RET_CODE_ERROR;
-}
+uint8_t DFRobot_BMP58X_I2C::readHoldingReg(uint8_t reg, void *data, uint8_t len) { return readReg(reg, data, len) ? RET_CODE_OK : RET_CODE_ERROR; }
 
-uint8_t DFRobot_BMP58X_I2C::readInputReg(uint8_t reg, void *data, uint8_t len) {
-  return readReg(reg, data, len) ? RET_CODE_OK : RET_CODE_ERROR;
-}
+uint8_t DFRobot_BMP58X_I2C::readInputReg(uint8_t reg, void *data, uint8_t len) { return readReg(reg, data, len) ? RET_CODE_OK : RET_CODE_ERROR; }
 
 bool DFRobot_BMP58X_I2C::readReg(uint8_t reg, void *data, uint8_t len) {
   uint16_t *tempData = static_cast<uint16_t *>(data);
@@ -437,15 +408,9 @@ bool DFRobot_BMP58X_I2C::begin(void) {
   _pWire->begin();
   return DFRobot_BMP58X::begin();
 }
-uint8_t DFRobot_BMP58X_SPI::writeHoldingReg(uint8_t reg, void *data, uint8_t len) {
-  return writeReg(reg, data, len) ? RET_CODE_OK : RET_CODE_ERROR;
-}
-uint8_t DFRobot_BMP58X_SPI::readHoldingReg(uint8_t reg, void *data, uint8_t len) {
-  return readReg(reg, data, len) ? RET_CODE_OK : RET_CODE_ERROR;
-}
-uint8_t DFRobot_BMP58X_SPI::readInputReg(uint8_t reg, void *data, uint8_t len) {
-  return readReg(reg, data, len) ? RET_CODE_OK : RET_CODE_ERROR;
-}
+uint8_t DFRobot_BMP58X_SPI::writeHoldingReg(uint8_t reg, void *data, uint8_t len) { return writeReg(reg, data, len) ? RET_CODE_OK : RET_CODE_ERROR; }
+uint8_t DFRobot_BMP58X_SPI::readHoldingReg(uint8_t reg, void *data, uint8_t len) { return readReg(reg, data, len) ? RET_CODE_OK : RET_CODE_ERROR; }
+uint8_t DFRobot_BMP58X_SPI::readInputReg(uint8_t reg, void *data, uint8_t len) { return readReg(reg, data, len) ? RET_CODE_OK : RET_CODE_ERROR; }
 bool DFRobot_BMP58X_SPI::readReg(uint8_t reg, void *data, uint8_t len) {
   uint16_t *tempData = static_cast<uint16_t *>(data);
   _pSpi->beginTransaction(SPISettings(100000, MSBFIRST, SPI_MODE0));
@@ -498,9 +463,7 @@ DFRobot_BMP58X_UART::DFRobot_BMP58X_UART(SoftwareSerial *sSerial, uint32_t Baud,
   __addr = addr;
 }
 #else
-DFRobot_BMP58X_UART::DFRobot_BMP58X_UART(HardwareSerial *hSerial, uint32_t Baud, uint16_t addr, uint8_t rxpin,
-                                         uint8_t txpin)
-    : DFRobot_RTU(hSerial) {
+DFRobot_BMP58X_UART::DFRobot_BMP58X_UART(HardwareSerial *hSerial, uint32_t Baud, uint16_t addr, uint8_t rxpin, uint8_t txpin) : DFRobot_RTU(hSerial) {
   _serial = hSerial;
   __baud = Baud;
   __rxpin = rxpin;
@@ -512,7 +475,7 @@ DFRobot_BMP58X_UART::~DFRobot_BMP58X_UART(void) {}
 
 bool DFRobot_BMP58X_UART::begin(void) {
 #ifdef ESP32
-  _serial->begin(__baud, SERIAL_8N1, __txpin, __rxpin);
+  _serial->begin(__baud, SERIAL_8N1, __rxpin, __txpin);
   delay(100);
 #elif defined(ARDUINO_AVR_UNO) || defined(ESP8266)
   _serial->begin(__baud);

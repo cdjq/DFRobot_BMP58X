@@ -4,8 +4,7 @@
 
 This is a library for BMP58X, which reads temperature and pressure. BMP(585/581) is a digital sensor for pressure and temperature measurement based on reliable sensing principles.
 
-![正反面svg效果图](https://github.com/Arya11111/DFRobot_MCP23017/blob/master/resources/images/SEN0245svg1.png)
-
+![正反面svg效果图]()
 
 ## Product Link（链接到英文商城）
     
@@ -37,7 +36,7 @@ To use this library, first download the library file, paste it into the \Arduino
 
 ## Methods
 
-```C++
+```python
 
 def begin(self):
 '''!
@@ -91,17 +90,17 @@ def set_osr(self, osr_t, osr_p):
 '''!
   @fn set_osr
   @brief Sets oversampling ratios for temperature and pressure
-  @param osr_t Temperature oversampling
-  @param osr_p Pressure oversampling
+  @param osr_temp Temperature oversampling
+  @param osr_press Pressure oversampling
   @n Supported values:
-  @n - eOVERSAMPLING_1X:   1x oversampling
-  @n - eOVERSAMPLING_2X:   2x oversampling
-  @n - eOVERSAMPLING_4X:   4x oversampling
-  @n - eOVERSAMPLING_8X:   8x oversampling
-  @n - eOVERSAMPLING_16X:  16x oversampling
-  @n - eOVERSAMPLING_32X:  32x oversampling
-  @n - eOVERSAMPLING_64X:  64x oversampling
-  @n - eOVERSAMPLING_128X: 128x oversampling
+  @n - OVERSAMPLING_1X:   1x oversampling
+  @n - OVERSAMPLING_2X:   2x oversampling
+  @n - OVERSAMPLING_4X:   4x oversampling
+  @n - OVERSAMPLING_8X:   8x oversampling
+  @n - OVERSAMPLING_16X:  16x oversampling
+  @n - OVERSAMPLING_32X:  32x oversampling
+  @n - OVERSAMPLING_64X:  64x oversampling
+  @n - OVERSAMPLING_128X: 128x oversampling
   @return true if configuration succeeds, false on failure
 '''
 
@@ -110,11 +109,11 @@ def set_measure_mode(self, mode):
   @fn setMeasureMode
   @brief  set the measurement mode of the sensor
   @param  mode: measurement mode
-  @n      ePOWERMODE_STANDBY = 0x00.        #// standby mode
-  @n      ePOWERMODE_NORMAL = 0x01.        #// normal mode
-  @n      ePOWERMODE_FORCED = 0x02.         #// forced mode > only perform once
-  @n      ePOWERMODE_CONTINOUS = 0x03.      #// continuous mode
-  @n      ePOWERMODE_DEEP_STANDBY = 0x04.   #// deep standby mode
+  @n      SLEEP_MODE = 0x00.        #// standby mode
+  @n      NORMAL_MODE = 0x01.        #// normal mode
+  @n      SINGLE_SHOT_MODE = 0x02.         #// forced mode > only perform once
+  @n      CONTINOUS_MODE = 0x03.      #// continuous mode
+  @n      DEEP_SLEEP_MODE = 0x04.   #// deep standby mode
   @return True if the setting is successful, False otherwise.
 '''
 
@@ -153,14 +152,14 @@ def config_iir(self, iir_t, iir_p):
   @param iir_t Temperature IIR filter
   @param iir_p Pressure IIR filter
   @n Available coefficients:
-  @n - eIIR_FILTER_BYPASS:   Bypass filter
-  @n - eIIR_FILTER_COEFF_1:  1st order filter
-  @n - eIIR_FILTER_COEFF_3:  3rd order filter
-  @n - eIIR_FILTER_COEFF_7:  7th order filter
-  @n - eIIR_FILTER_COEFF_15: 15th order filter
-  @n - eIIR_FILTER_COEFF_31: 31st order filter
-  @n - eIIR_FILTER_COEFF_63: 63rd order filter
-  @n - eIIR_FILTER_COEFF_127:127th order filter
+  @n - IIR_FILTER_BYPASS:   Bypass filter
+  @n - IIR_FILTER_COEFF_1:  1st order filter
+  @n - IIR_FILTER_COEFF_3:  3rd order filter
+  @n - IIR_FILTER_COEFF_7:  7th order filter
+  @n - IIR_FILTER_COEFF_15: 15th order filter
+  @n - IIR_FILTER_COEFF_31: 31st order filter
+  @n - IIR_FILTER_COEFF_63: 63rd order filter
+  @n - IIR_FILTER_COEFF_127:127th order filter
   @return True if configuration is successful, False otherwise
 '''
 
@@ -170,27 +169,27 @@ def config_fifo(self, frame_sel=eFIFO_PRESS_TEMP_DATA, dec_sel=eFIFO_NO_DOWNSAMP
   @brief Configures FIFO operation parameters
   @param frame_sel Data frame type
   @n Available types:
-  @n - eFIFO_NOT_ENABLED:    FIFO disabled
-  @n - eFIFO_TEMPERATURE_DATA: Temperature data only
-  @n - eFIFO_PRESSURE_DATA:    Pressure data only
-  @n - eFIFO_PRESS_TEMP_DATA:  Pressure and temperature data
-  
+  @n - FIFO_DISABLED:    FIFO disabled
+  @n - FIFO_TEMPERATURE_DATA: Temperature data only
+  @n - FIFO_PRESSURE_DATA:    Pressure data only
+  @n - FIFO_PRESS_TEMP_DATA:  Pressure and temperature data
+
   @param dec_sel Downsampling ratio
   @n Available ratios:
-  @n - eFIFO_NO_DOWNSAMPLING: No downsampling
-  @n - eFIFO_DOWNSAMPLING_2X:  2x downsampling
-  @n - eFIFO_DOWNSAMPLING_4X:  4x downsampling
-  @n - eFIFO_DOWNSAMPLING_8X:  8x downsampling
-  @n - eFIFO_DOWNSAMPLING_16X: 16x downsampling
-  @n - eFIFO_DOWNSAMPLING_32X: 32x downsampling
-  @n - eFIFO_DOWNSAMPLING_64X: 64x downsampling
-  @n - eFIFO_DOWNSAMPLING_128X:128x downsampling
-  
+  @n - FIFO_NO_DOWNSAMPLING: No downsampling
+  @n - FIFO_DOWNSAMPLING_2X:  2x downsampling
+  @n - FIFO_DOWNSAMPLING_4X:  4x downsampling
+  @n - FIFO_DOWNSAMPLING_8X:  8x downsampling
+  @n - FIFO_DOWNSAMPLING_16X: 16x downsampling
+  @n - FIFO_DOWNSAMPLING_32X: 32x downsampling
+  @n - FIFO_DOWNSAMPLING_64X: 64x downsampling
+  @n - FIFO_DOWNSAMPLING_128X:128x downsampling
+
   @param mode FIFO operation mode
   @n Available modes:
-  @n - eFIFO_STREAM_TO_FIFO_MODE: Stream data continuously
-  @n - eFIFO_STOP_ON_FULL_MODE:   Stop when FIFO full
-  
+  @n - FIFO_STREAM_TO_FIFO_MODE: Stream data continuously
+  @n - FIFO_STOP_ON_FULL_MODE:   Stop when FIFO full
+
   @param threshold FIFO trigger threshold (0=disable, 1-31=frames)]
   @n - 0x0F: 15 frames. This is the maximum setting in PT-mode. The most
   significant bit is ignored.
@@ -221,18 +220,18 @@ def config_interrupt(self, int_mode, int_pol, int_od):
   @brief Configures interrupt behavior
   @param int_mode Trigger mode
   @n Available modes:
-  @n - eINT_MODE_PULSED: Pulsed mode
-  @n - eINT_MODE_LATCHED: Latched mode
-  
+  @n - INT_MODE_PULSED: Pulsed mode
+  @n - INT_MODE_LATCHED: Latched mode
+
   @param int_pol Signal polarity
   @n Available polarities:
-  @n - eINT_POL_ACTIVE_LOW: Active low
-  @n - eINT_POL_ACTIVE_HIGH: Active high
-  
+  @n - INT_POL_ACTIVE_LOW: Active low
+  @n - INT_POL_ACTIVE_HIGH: Active high
+
   @param int_od Output driver type
   @n Available types:
-  @n - eINT_OD_PUSH_PULL: Push-pull output
-  @n - eINT_OD_OPEN_DRAIN: Open-drain output
+  @n - INT_OD_PUSH_PULL: Push-pull output
+  @n - INT_OD_OPEN_DRAIN: Open-drain output
   @return True if configuration is successful, False otherwise.
 '''
 
@@ -261,39 +260,78 @@ def get_int_status(self):
   @n      eINT_STATUS_POR_SOFTRESET_COMPLETE = 0x10,
 '''
 
-def set_oor_press(self, oor, range, cnt_lim):
+def set_oor_press(self, oor, range_val, cnt_lim):
 '''!
-  @brief  Set the out of range pressure of the sensor.
-  @param  oor: Out of range pressure.
-  @n      0x00000 - 0x1FFFF: Out of range pressure
-  @param  range: Out of range pressure range.
-  @n      0x00 - 0xFF: Out of range pressure range  (oor - range, oor + range)
-  @param  cnt_lim: Out of range pressure count limit.
+  @brief  Set the out of range_val pressure of the sensor.
+  @param  oor: Out of range_val pressure.
+  @n      0x00000 - 0x1FFFF: Out of range_val pressure
+  @param  range_val: Out of range_val pressure range_val.
+  @n      0x00 - 0xFF: Out of range_val pressure range_val  (oor - range_val, oor + range_val)
+  @param  cnt_lim: Out of range_val pressure count limit.
   @n      eOOR_COUNT_LIMIT_1  = 0x00
   @n      eOOR_COUNT_LIMIT_3  = 0x01
   @n      eOOR_COUNT_LIMIT_7  = 0x02
   @n      eOOR_COUNT_LIMIT_15 = 0x03
   @return True if configuration is successful, False otherwise.
 '''
+
+def calibrated_absolute_difference(self, altitude):
+'''!
+  @fn calibratedAbsoluteDifference
+  @brief use the given current altitude as a reference value, eliminate the absolute difference of subsequent pressure and altitude data
+  @param altitude current altitude
+  @return boolean, indicates whether the reference value is set successfully
+  @retval True indicates the reference value is set successfully
+  @retval False indicates fail to set the reference value
+'''
+
+def set_baud(self, baud):
+'''!
+  @fn setBaud
+  @brief Set the UART communication baud rate.
+  @details Configures the serial communication speed using the specified baud rate enum.
+          This function initializes the necessary hardware registers to achieve the desired
+          data transfer rate.
+  @param baud An eBaud enum value specifying the desired baud rate.
+              Defaults to e9600 if not explicitly set.
+  @note Actual hardware configuration may vary depending on the microcontroller model.
+        The function assumes a standard clock frequency; adjust clock settings
+        if using non-default system clock configurations.
+  @warning Changing the baud rate during communication may cause data loss
+          or communication errors if both devices are not synchronized.
+  @see eBaud for available baud rate options:
+      - BAUD_2400: 2400 bits per second
+      - BAUD_4800: 4800 bits per second
+      - BAUD_9600: 9600 bits per second (default)
+      - BAUD_14400: 14400 bits per second
+      - BAUD_19200: 19200 bits per second
+      - BAUD_38400: 38400 bits per second
+      - BAUD_57600: 57600 bits per second
+      - BAUD_115200: 115200 bits per second
+'''
 ```
 
 ## Compatibility
 
 
-| MCU                | Work Well | Work Wrong | Untested | Remarks |
-| ------------------ |:---------:|:----------:|:--------:| ------- |
-| Arduino uno        | √         |            |          |         |
-| FireBeetle esp32   | √         |            |          |         |
-| FireBeetle esp8266 | √         |            |          |         |
-| FireBeetle m0      | √         |            |          |         |
-| Leonardo           | √         |            |          |         |
-| Microbit           | √         |            |          |         |
-| Arduino MEGA2560   | √         |            |          |         |
+* RaspberryPi Version
 
+| Board        | Work Well | Work Wrong | Untested | Remarks |
+| ------------ | :-------: | :--------: | :------: | ------- |
+| RaspberryPi2 |           |            |    √     |         |
+| RaspberryPi3 |           |            |    √     |         |
+| RaspberryPi4 |     √     |            |          |         |
+
+* Python Version
+
+| Python  | Work Well | Work Wrong | Untested | Remarks |
+| ------- | :-------: | :--------: | :------: | ------- |
+| Python2 |           |            |     √    |         |
+| Python3 |     √     |            |          |         |
 
 ## History
 
-- Data 2025-06-06
+- Data 2025-09-23
 - Version V1.0
 
 ## Credits

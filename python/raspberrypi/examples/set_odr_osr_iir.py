@@ -37,7 +37,7 @@ if mode == "I2C":
     I2C_BUS    = 0x01
     bmp5 = DFRobot_BMP58X_I2C(I2C_BUS, DEV_ADDR)
 elif mode == "SPI":
-    CS         = 8
+    CS         = 16
     bmp5 = DFRobot_BMP58X_SPI(cs=CS, bus=0, dev=0, speed=8000000)
 elif mode == "UART":
     bmp5 = DFRobot_BMP58X_UART(9600, DEV_ADDR)
@@ -45,7 +45,7 @@ elif mode == "UART":
 global interrupt_flag
 interrupt_flag = False
 
-def drdy_callback():
+def drdy_callback(channel):
     global interrupt_flag
     interrupt_flag = True
 
@@ -164,10 +164,11 @@ def loop():
     global interrupt_flag
     if interrupt_flag:
         interrupt_flag = False
-        print("temperature : %.2f (C)" % (bmp5.read_temperature()))
-        print("Pressure : %.2f (Pa)" % (bmp5.read_pressure()))
-        print("Altitude : %.2f (M)" % (bmp5.read_altitude()))
-        print("")
+        if bmp5.get_int_status() & bmp5.INT_DATA_DRDY:
+            print("temperature : %.2f (C)" % (bmp5.read_temperature()))
+            print("Pressure : %.2f (Pa)" % (bmp5.read_pressure()))
+            print("Altitude : %.2f (M)" % (bmp5.read_altitude()))
+            print("")
 
 if __name__ == "__main__":
     setup()

@@ -247,7 +247,7 @@ uint8_t configInterrupt(eIntMode_t mode, eIntPolarity_t pol, eIntOutputMode_t ou
  * @n - eIntDataReady:    数据就绪中断
  * @n - eIntFIFOFull:    FIFO满中断
  * @n - eIntFIFOThres:   FIFO阈值中断
- * @n - eIntPressureOor: 压力超出范围中断
+ * @n - eIntPressureOOR: 压力超出范围中断
  * @details 可以使用按位或(|)组合多个中断源。
  *          示例: 同时启用数据就绪和FIFO满中断:
  *          @code
@@ -265,13 +265,13 @@ uint8_t setIntSource(uint8_t source);
  * @n - eIntStatusDataReady: 数据就绪(0x01)
  * @n - eIntStatusFIFOFull: FIFO已满 (0x02)
  * @n - eIntStatusFIFOThres: FIFO达到阈值(0x04)
- * @n - eIntStatusPressureOor: 压力超出范围(0x08)
+ * @n - eIntStatusPressureOOR: 压力超出范围(0x08)
  * @n - eIntStatusResetComplete: 复位完成(0x10)
  */
 uint16_t getIntStatus(void);
 
 /**
- * @fn setOORPress
+ * @fn setPressOOR
  * @brief 配置压力超出范围检测
  * @param oor 阈值压力值(0x00000-0x1FFFF)
  * @param range 迟滞范围(0-255)
@@ -284,7 +284,7 @@ uint16_t getIntStatus(void);
  * @n - eOORCountLimit15: 15次计数
  * @return 成功返回0，错误返回1
  */
-uint8_t setOORPress(uint32_t oor, uint8_t range, eOORCountLimit_t cntLimit);
+uint8_t setPressOOR(uint32_t oor, uint8_t range, eOORCountLimit_t cntLimit);
 
 /**
  * @fn calibratedAbsoluteDifference
@@ -296,23 +296,45 @@ uint8_t setOORPress(uint32_t oor, uint8_t range, eOORCountLimit_t cntLimit);
  */
 bool calibratedAbsoluteDifference(float altitude);
 
+/**
+ * @fn setBaud
+ * @brief 设置UART通信波特率
+ * @details 使用指定的波特率枚举值配置串行通信速度。
+ *          该函数初始化必要的硬件寄存器以实现所需的数据传输速率。
+ * @param baud eBaud枚举值，指定所需的波特率。
+ *             如果未显式设置，默认为e9600。
+ * @note 实际硬件配置可能因微控制器型号而异。
+ *       该函数假设使用标准时钟频率；如果使用非默认系统时钟配置，请调整时钟设置。
+ * @warning 在通信过程中更改波特率可能导致数据丢失或通信错误（如果两个设备未同步）。
+ * @see eBaud可用的波特率选项：
+ *      - e2400: 2400比特/秒
+ *      - e4800: 4800比特/秒  
+ *      - e9600: 9600比特/秒（默认值）
+ *      - e14400: 14400比特/秒
+ *      - e19200: 19200比特/秒
+ *      - e38400: 38400比特/秒
+ *      - e57600: 57600比特/秒
+ *      - e115200: 115200比特/秒
+ */
+void setBaud(eBaud baud);
+
 ```
 
 ## 兼容性
 
-| MCU                | Work Well | Work Wrong | Untested | Remarks |
+| MCU                | 运行良好 | 运行异常 | 未测试 | 备注 |
 | ------------------ |:---------:|:----------:|:--------:| ------- |
-| Arduino uno        |          |            | √         |         |
-| FireBeetle esp32   |          |            | √         |         |
-| FireBeetle esp8266 |          |            | √         |         |
-| FireBeetle m0      |          |            | √         |         |
-| Leonardo           |          |            | √         |         |
-| Microbit           |          |            | √         |         |
-| Arduino MEGA2560   |          |            | √         |         |
+| Arduino uno        |          |            |          |         |
+| FireBeetle esp32   |          |            |          |         |
+| FireBeetle esp8266 |          |            |          |         |
+| FireBeetle m0      |          |            |          |         |
+| Leonardo           |          |            |          |         |
+| Microbit           |          |            |          |         |
+| Arduino MEGA2560   |          |            |          |         |
 
 ## 历史
 
-- Data 2025-06-06
+- Data 2025-09-22
 - Version V1.0.0
 
 ## 创作者

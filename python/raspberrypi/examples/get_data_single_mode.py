@@ -1,19 +1,15 @@
-# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*
 '''!
-  @file  interrupt_using_fifo.py
-  @brief  Acquire temperature/pressure data via FIFO threshold or FIFO full interrupts
-  @details  Demonstrate data acquisition from BMP58X using:
-            - FIFO threshold interrupt (when FIFO reaches configured frame count)
-            - FIFO full interrupt (when FIFO buffer is completely filled)
-            - Data is read from FIFO buffer upon interrupt trigger
-  @copyright  Copyright (c) 2025 DFRobot Co.Ltd (http://www.dfrobot.com)
-  @license    The MIT License (MIT)
-  @author     yuanlong.yu(yuanlong.yu@dfrobot.com)
-  @version    V1.0.0
-  @date       2025-06-06
-  @url        https://github.com/DFRobot/DFRobot_BMP58X
+  @file  get_data_single_mode.py
+  @details  This program communicates with the BMP58x pressure sensor and explains how to use a single acquisition mode
+  @n        to collect pressure, temperature, and altitude data through external interrupts.
+  @copyright   Copyright (c) 2025 DFRobot Co.Ltd (http://www.dfrobot.com)
+  @license     The MIT License (MIT)
+  @author      yuanlong.yu(yuanlong.yu@dfrobot.com)
+  @version     V1.0.0
+  @date        2025-09-17
+  @url         https://github.com/DFRobot/DFRobot_BMP58X
 '''
-
 import os
 import sys
 import time
@@ -47,7 +43,7 @@ elif mode == "UART":
 global interrupt_flag
 interrupt_flag = False
 
-def int_callback(channel):
+def drdy_callback(channel):
     global interrupt_flag
     interrupt_flag = True
 
@@ -55,45 +51,13 @@ gpio_interrupt = 27
 GPIO.setwarnings(False)
 GPIO.setmode(GPIO.BCM)
 GPIO.setup(gpio_interrupt, GPIO.IN)
-GPIO.add_event_detect(gpio_interrupt, GPIO.RISING, callback=int_callback)
+GPIO.add_event_detect(gpio_interrupt, GPIO.RISING, callback=drdy_callback)
 
 def setup():
     while not bmp5.begin():
         print("sensor init error,please check connect!")
         time.sleep(1)
     
-    '''!
-      @brief Configures FIFO operation parameters
-      @param frame_sel Data frame type
-      @n Available types:
-      @n - FIFO_NOT_ENABLED:    FIFO disabled
-      @n - FIFO_TEMPERATURE_DATA: Temperature data only
-      @n - FIFO_PRESSURE_DATA:    Pressure data only
-      @n - FIFO_PRESS_TEMP_DATA:  Pressure and temperature data
-     
-      @param dec_sel Downsampling ratio
-      @n Available ratios:
-      @n - FIFO_NO_DOWNSAMPLING: No downsampling
-      @n - FIFO_DOWNSAMPLING_2X:  2x downsampling
-      @n - FIFO_DOWNSAMPLING_4X:  4x downsampling
-      @n - FIFO_DOWNSAMPLING_8X:  8x downsampling
-      @n - FIFO_DOWNSAMPLING_16X: 16x downsampling
-      @n - FIFO_DOWNSAMPLING_32X: 32x downsampling
-      @n - FIFO_DOWNSAMPLING_64X: 64x downsampling
-      @n - FIFO_DOWNSAMPLING_128X:128x downsampling
-     
-      @param mode FIFO operation mode
-      @n Available modes:
-      @n - FIFO_STREAM_TO_FIFO_MODE: Stream data continuously
-      @n - FIFO_STOP_ON_FULL_MODE:   Stop when FIFO full
-     
-      @param threshold FIFO trigger threshold (0=disable, 1-31=frames)]
-      @n - 0x0F: 15 frames. This is the maximum setting in PT-mode. The most
-      significant bit is ignored.
-      @n - 0x1F: 31 frames. This is the maximum setting in P- or T-mode.
-    '''
-    bmp5.config_fifo(bmp5.FIFO_PRESS_TEMP_DATA, bmp5.FIFO_NO_DOWNSAMPLING, bmp5.FIFO_STREAM_TO_FIFO_MODE, 0x02)
-
     '''!
       @brief Configures interrupt behavior
       @param int_mode Trigger mode
@@ -128,7 +92,7 @@ def setup():
       @n - INT_FIFO_THRES:   FIFO threshold interrupt
       @n - INT_PRESSURE_OOR: Pressure out-of-range interrupt
     '''
-    bmp5.set_int_source(bmp5.INT_FIFO_THRES)
+    bmp5.set_int_source(bmp5.INT_DATA_DRDY)
 
     '''!
       # Calibrate the sensor according to the current altitude
@@ -139,6 +103,7 @@ def setup():
     '''
     if CALIBRATE_ABSOLUTE_DIFFERENCE:
         bmp5.calibrated_absolute_difference(540.0)
+
     '''!
         @brief  set the measurement mode of the sensor
         @param  mode: measurement mode
@@ -148,17 +113,19 @@ def setup():
         @n      CONTINOUS_MODE = 0x03.      #// continuous mode
         @n      DEEP_SLEEP_MODE = 0x04.   #// deep standby mode
     '''
-    bmp5.set_measure_mode(bmp5.NORMAL_MODE)
+    bmp5.set_measure_mode(bmp5.SINGLE_SHOT_MODE)
 
 def loop():
     global interrupt_flag
     if interrupt_flag:
-        if bmp5.get_int_status() & (bmp5.INT_FIFO_THRES | bmp5.INT_FIFO_FULL):
-            data = bmp5.get_fifo_data()
-            print("FIFO len: {} ".format(data.len))
-            for i in range(data.len):
-                print("Temperature: {0:.2f} C, Pressure: {1:.2f} Pa".format(data.temperature[i], data.pressure[i]))
         interrupt_flag = False
+        if bmp5.get_int_status() & bmp5.INT_DATA_DRDY:
+            print("temperature : %.2f (C)" % (bmp5.read_temperature()))
+            print("Pressure : %.2f (Pa)" % (bmp5.read_pressure()))
+            print("Altitude : %.2f (M)" % (bmp5.read_altitude()))
+            print("")
+            time.sleep(0.5)
+            bmp5.set_measure_mode(bmp5.SINGLE_SHOT_MODE)
 
 if __name__ == "__main__":
     setup()

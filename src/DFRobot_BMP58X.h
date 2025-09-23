@@ -378,7 +378,7 @@ class DFRobot_BMP58X {
     eIntStatusDataReady = 0x01,
     eIntStatusFIFOFull = 0x02,
     eIntStatusFIFOThres = 0x04,
-    eIntStatusPressureOor = 0x08,
+    eIntStatusPressureOOR = 0x08,
     eIntStatusResetComplete = 0x10,
   } eIntStatus_t;
 
@@ -419,7 +419,7 @@ class DFRobot_BMP58X {
     eIntDataReady = 0x01,
     eIntFIFOFull = 0x02,
     eIntFIFOThres = 0x04,
-    eIntPressureOor = 0x08,
+    eIntPressureOOR = 0x08,
   } eIntSource_t;
 
   /**
@@ -647,7 +647,7 @@ class DFRobot_BMP58X {
    * @n - eIntDataReady:    Data ready interrupt
    * @n - eIntFIFOFull:    FIFO full interrupt
    * @n - eIntFIFOThres:   FIFO threshold interrupt
-   * @n - eIntPressureOor: Pressure out-of-range interrupt
+   * @n - eIntPressureOOR: Pressure out-of-range interrupt
    * @details You can combine multiple interrupt sources using bitwise OR (|).
    *          Example: Enable both data ready and FIFO full interrupts:
    *          @code
@@ -665,13 +665,13 @@ class DFRobot_BMP58X {
    * @n - eIntStatusDataReady: Data ready (0x01)
    * @n - eIntStatusFIFOFull: FIFO full  (0x02)
    * @n - eIntStatusFIFOThres: FIFO threshold reached (0x04)
-   * @n - eIntStatusPressureOor: Pressure out-of-range (0x08)
+   * @n - eIntStatusPressureOOR: Pressure out-of-range (0x08)
    * @n - eIntStatusResetComplete: Reset complete (0x10)
    */
   uint16_t getIntStatus(void);
 
   /**
-   * @fn setOORPress
+   * @fn setPressOOR
    * @brief Configures pressure out-of-range detection
    * @param oor Threshold pressure value (0x00000-0x1FFFF)
    * @param range Hysteresis range (0-255)
@@ -684,7 +684,7 @@ class DFRobot_BMP58X {
    * @n - eOORCountLimit15: 15 counts
    * @return uint8_t 0 on success, 1 on error
    */
-  uint8_t setOORPress(uint32_t oor, uint8_t range, eOORCountLimit_t cntLimit);
+  uint8_t setPressOOR(uint32_t oor, uint8_t range, eOORCountLimit_t cntLimit);
 
   /**
    * @fn calibratedAbsoluteDifference

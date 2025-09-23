@@ -8,7 +8,7 @@
   @license     The MIT License (MIT)
   @author      yuanlong.yu(yuanlong.yu@dfrobot.com)
   @version     V1.0.0
-  @date        2025-06-06
+  @date        2025-09-23
   @url         https://github.com/DFRobot/DFRobot_BMP58X
 '''
 import os
@@ -31,7 +31,7 @@ if mode == "I2C":
     I2C_BUS    = 0x01
     bmp5 = DFRobot_BMP58X_I2C(I2C_BUS, DEV_ADDR)
 elif mode == "SPI":
-    CS         = 8
+    CS         = 16
     bmp5 = DFRobot_BMP58X_SPI(cs=CS, bus=0, dev=0, speed=8000000)
 elif mode == "UART":
     bmp5 = DFRobot_BMP58X_UART(9600, DEV_ADDR)

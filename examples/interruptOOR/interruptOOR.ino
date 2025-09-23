@@ -1,4 +1,4 @@
-/**
+  /**
  * @file  interruptOOR.ino
  * @brief  Get the temperature and pressure data of the BMP58X through interrupts
  * @details  Obtain BMP58X data by using data in OOR interrupt. !!! The pressure OOR interrupt is triggered using raw, 
@@ -8,21 +8,23 @@
  * @license     The MIT License (MIT)
  * @author      yuanlong.yu(yuanlong.yu@dfrobot.com)
  * @version     V1.0.0
- * @date        2025-07-29
+ * @date        2025-09-17
  * @url         https://github.com/DFRobot/DFRobot_BMP58X
  */
 
 #include "DFRobot_BMP58X.h"
-#include "DFRobot_RTU.h"
 
 /* >> 1.Please choose your communication method below: */
 // #define BMP5_COMM_UART
 #define BMP5_COMM_I2C
 // #define BMP5_COMM_SPI
 
+/* >> 2.If there is no need to eliminate the absolute measurement error, please annotate the following line */
+#define CALIBRATE_ABSOLUTE_DIFFERENCE
+
 /**
- * >> 2.Configure the interrupt mode you need to use: Opening the macro below is a latch interrupt,
- * otherwise it is a pulse interrupt。
+ * >> 3.Configure the interrupt mode you need to use: Opening the macro below is a latch interrupt,
+ * otherwise it is a pulse interrupt。Latched interrupts must read the interrupt status register before new interrupts can be generated.
 */
 // #define BMP5_INT_MODE_LATCHED
 
@@ -39,8 +41,8 @@ const uint8_t ADDR = 0x47;
  *    board   |             MCU                | Leonardo/Mega2560/M0 |    UNO    | ESP8266 | ESP32 |  microbit  |   m0  |
  *     VCC    |            3.3V/5V             |        VCC           |    VCC    |   VCC   |  VCC  |     X      |  vcc  |
  *     GND    |              GND               |        GND           |    GND    |   GND   |  GND  |     X      |  gnd  |
- *     RX     |              TX                |     Serial1 TX1      |     5     |   5/D6  |  D2   |     X      |  tx1  |
- *     TX     |              RX                |     Serial1 RX1      |     4     |   4/D7  |  D3   |     X      |  rx1  |
+ *     RX     |              TX                |     Serial1 TX1      |     5     |   5/D6  |  26/D3|     X      |  tx1  |
+ *     TX     |              RX                |     Serial1 RX1      |     4     |   4/D7  |  25/D2|     X      |  rx1  |
  * ----------------------------------------------------------------------------------------------------------------------*/
 #if defined(ARDUINO_AVR_UNO) || defined(ESP8266)
 #include <SoftwareSerial.h>
@@ -56,7 +58,13 @@ DFRobot_BMP58X_UART bmp58x(&Serial1, 9600, ADDR);
 #elif defined(BMP5_COMM_I2C)
 DFRobot_BMP58X_I2C bmp58x(&Wire, ADDR);
 #elif defined(BMP5_COMM_SPI)
-DFRobot_BMP58X_SPI bmp58x(&SPI, D3);
+  #if defined(ESP32)
+    DFRobot_BMP58X_SPI bmp58x(&SPI, 26 /*D3*/);
+  #elif defined(ARDUINO_BBC_MICROBIT_V2)
+    DFRobot_BMP58X_SPI bmp58x(&SPI, 16);
+  #else 
+    DFRobot_BMP58X_SPI bmp58x(&SPI, 5);
+  #endif
 #else
 #error
 #endif
@@ -69,7 +77,7 @@ void interrupt() {
 }
 
 void setup() {
-  Serial.begin(9600);
+  Serial.begin(115200);
   Serial.println("Start..");
   while (!bmp58x.begin()) {
     Serial.println("Sensor init fail!");
@@ -90,7 +98,7 @@ void setup() {
    * When the sensor detects a pressure value outside the range of 94608-94708Pa for 1 consecutive reading,
    * it triggers an OOR event, which can be monitored via interrupts or polling.
    */
-  bmp58x.setOORPress(94658, 50, bmp58x.eOORCountLimit1);
+  bmp58x.setPressOOR(94658, 50, bmp58x.eOORCountLimit1);
 
   /**
    * @param intMode Trigger mode (see: eIntMode_t)
@@ -121,20 +129,19 @@ void setup() {
    * @n - eIntDataReady:    Data ready interrupt
    * @n - eIntFIFOFull:    FIFO full interrupt
    * @n - eIntFIFOThres:   FIFO threshold interrupt
-   * @n - eIntPressureOor: Pressure out-of-range interrupt
+   * @n - eIntPressureOOR: Pressure out-of-range interrupt
    */
-  bmp58x.setIntSource(bmp58x.eIntPressureOor);
+  bmp58x.setIntSource(bmp58x.eIntPressureOOR);
 
+  #if defined(CALIBRATE_ABSOLUTE_DIFFERENCE)
   /**
-   * @param mode Operation mode (see: eMeasureMode_t)
-   * @n Available modes:
-   * @n - eSleep:         Sleep mode
-   * @n - eNormal:        Normal measurement mode
-   * @n - eSingleShot:    Single-shot measurement
-   * @n - eContinuous:    Continuous measurement
-   * @n - eDeepSleep:     Deep Sleep mode
+   * Calibrate the sensor according to the current altitude
+   * In this example, we use an altitude of 540 meters in Wenjiang District of Chengdu (China). 
+   * Please change to the local altitude when using it.
+   * If this interface is not called, the measurement data will not eliminate the absolute difference.
    */
-  bmp58x.setMeasureMode(bmp58x.eNormal);
+    bmp58x.calibratedAbsoluteDifference(540.0);
+  #endif
 
 #if defined(ESP32) || defined(ESP8266)
   // D6 pin is used as interrupt pin by default, other non-conflicting pins can also be selected as external interrupt pins.
@@ -169,19 +176,28 @@ void setup() {
                                                            // UNO(2), Mega2560(2), Leonardo(3), microbit(P0).
 #endif
   
+  /**
+   * @param mode Operation mode (see: eMeasureMode_t)
+   * @n Available modes:
+   * @n - eSleep:         Sleep mode
+   * @n - eNormal:        Normal measurement mode
+   * @n - eSingleShot:    Single-shot measurement
+   * @n - eContinuous:    Continuous measurement
+   * @n - eDeepSleep:     Deep Sleep mode
+   */
+  bmp58x.setMeasureMode(bmp58x.eNormal);
 }
 void loop() {
-#if defined(BMP5_INT_MODE_LATCHED)
-  bmp58x.getIntStatus(); // Latched interrupts must read the interrupt status register before new interrupts can be generated.
-#endif
   if (flag == 1) {
     flag = 0;
-    Serial.print("temp: ");
-    Serial.print(bmp58x.readTempC());
-    Serial.print(" (C)  press: ");
-    Serial.print(bmp58x.readPressPa());
-    Serial.print(" (Pa)  alt: ");
-    Serial.print(bmp58x.readAltitudeM());
-    Serial.println(" (M)");
+    if (bmp58x.getIntStatus() & bmp58x.eIntPressureOOR){
+      Serial.print("temp: ");
+      Serial.print(bmp58x.readTempC());
+      Serial.print(" (C)  press: ");
+      Serial.print(bmp58x.readPressPa());
+      Serial.print(" (Pa)  alt: ");
+      Serial.print(bmp58x.readAltitudeM());
+      Serial.println(" (M)");
+    }
   }
 }

@@ -4,7 +4,7 @@
 
 This is a library for BMP58X, which reads temperature and pressure. BMP(585/581) is a digital sensor for pressure and temperature measurement based on reliable sensing principles.
 
-![正反面svg效果图](https://github.com/Arya11111/DFRobot_MCP23017/blob/master/resources/images/SEN0245svg1.png)
+![正反面svg效果图]
 
 
 ## Product Link（链接到英文商城）
@@ -248,7 +248,7 @@ uint8_t configInterrupt(eIntMode_t mode, eIntPolarity_t pol, eIntOutputMode_t ou
  * @n - eIntDataReady:    Data ready interrupt
  * @n - eIntFIFOFull:    FIFO full interrupt
  * @n - eIntFIFOThres:   FIFO threshold interrupt
- * @n - eIntPressureOor: Pressure out-of-range interrupt
+ * @n - eIntPressureOOR: Pressure out-of-range interrupt
  * @details You can combine multiple interrupt sources using bitwise OR (|).
  *          Example: Enable both data ready and FIFO full interrupts:
  *          @code
@@ -266,13 +266,13 @@ uint8_t setIntSource(uint8_t source);
  * @n - eIntStatusDataReady: Data ready (0x01)
  * @n - eIntStatusFIFOFull: FIFO full  (0x02)
  * @n - eIntStatusFIFOThres: FIFO threshold reached (0x04)
- * @n - eIntStatusPressureOor: Pressure out-of-range (0x08)
+ * @n - eIntStatusPressureOOR: Pressure out-of-range (0x08)
  * @n - eIntStatusResetComplete: Reset complete (0x10)
  */
 uint16_t getIntStatus(void);
 
 /**
- * @fn setOORPress
+ * @fn setPressOOR
  * @brief Configures pressure out-of-range detection
  * @param oor Threshold pressure value (0x00000-0x1FFFF)
  * @param range Hysteresis range (0-255)
@@ -285,7 +285,7 @@ uint16_t getIntStatus(void);
  * @n - eOORCountLimit15: 15 counts
  * @return uint8_t 0 on success, 1 on error
  */
-uint8_t setOORPress(uint32_t oor, uint8_t range, eOORCountLimit_t cntLimit);
+uint8_t setPressOOR(uint32_t oor, uint8_t range, eOORCountLimit_t cntLimit);
 
 /**
  * @fn calibratedAbsoluteDifference
@@ -298,6 +298,31 @@ uint8_t setOORPress(uint32_t oor, uint8_t range, eOORCountLimit_t cntLimit);
  */
 bool calibratedAbsoluteDifference(float altitude);
 
+/**
+ * @fn setBaud
+ * @brief Set the UART communication baud rate.
+ * @details Configures the serial communication speed using the specified baud rate enum.
+ *          This function initializes the necessary hardware registers to achieve the desired
+ *          data transfer rate.
+ * @param baud An eBaud enum value specifying the desired baud rate.
+ *             Defaults to e9600 if not explicitly set.
+ * @note Actual hardware configuration may vary depending on the microcontroller model.
+ *       The function assumes a standard clock frequency; adjust clock settings
+ *       if using non-default system clock configurations.
+ * @warning Changing the baud rate during communication may cause data loss
+ *          or communication errors if both devices are not synchronized.
+ * @see eBaud for available baud rate options:
+ *      - e2400: 2400 bits per second
+ *      - e4800: 4800 bits per second
+ *      - e9600: 9600 bits per second (default)
+ *      - e14400: 14400 bits per second
+ *      - e19200: 19200 bits per second
+ *      - e38400: 38400 bits per second
+ *      - e57600: 57600 bits per second
+ *      - e115200: 115200 bits per second
+ */
+void setBaud(eBaud baud);
+
 ```
 
 ## Compatibility
@@ -305,18 +330,18 @@ bool calibratedAbsoluteDifference(float altitude);
 
 | MCU                | Work Well | Work Wrong | Untested | Remarks |
 | ------------------ |:---------:|:----------:|:--------:| ------- |
-| Arduino uno        |          |            | √         |         |
-| FireBeetle esp32   |          |            | √         |         |
-| FireBeetle esp8266 |          |            | √         |         |
-| FireBeetle m0      |          |            | √         |         |
-| Leonardo           |          |            | √         |         |
-| Microbit           |          |            | √         |         |
-| Arduino MEGA2560   |          |            | √         |         |
+| Arduino uno        |          |            |          |         |
+| FireBeetle esp32   |          |            |          |         |
+| FireBeetle esp8266 |          |            |          |         |
+| FireBeetle m0      |          |            |          |         |
+| Leonardo           |          |            |          |         |
+| Microbit           |          |            |          |         |
+| Arduino MEGA2560   |          |            |          |         |
 
 
 ## History
 
-- Data 2025-06-06
+- Data 2025-09-22
 - Version V1.0
 
 ## Credits

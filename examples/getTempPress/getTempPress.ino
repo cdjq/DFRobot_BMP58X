@@ -7,11 +7,10 @@
  * @license     The MIT License (MIT)
  * @author      yuanlong.yu(yuanlong.yu@dfrobot.com)
  * @version     V1.0.0
- * @date        2025-07-29
+ * @date        2025-09-17
  * @url         https://github.com/DFRobot/DFRobot_BMP58X
  */
 #include "DFRobot_BMP58X.h"
-#include "DFRobot_RTU.h"
 
 /* >> 1.Please choose your communication method below: */
 // #define BMP5_COMM_UART
@@ -34,8 +33,8 @@ const uint8_t ADDR = 0x47;
  *    board   |             MCU                | Leonardo/Mega2560/M0 |    UNO    | ESP8266 | ESP32 |  microbit  |   m0  |
  *     VCC    |            3.3V/5V             |        VCC           |    VCC    |   VCC   |  VCC  |     X      |  vcc  |
  *     GND    |              GND               |        GND           |    GND    |   GND   |  GND  |     X      |  gnd  |
- *     RX     |              TX                |     Serial1 TX1      |     5     |   5/D6  |  D2   |     X      |  tx1  |
- *     TX     |              RX                |     Serial1 RX1      |     4     |   4/D7  |  D3   |     X      |  rx1  |
+ *     RX     |              TX                |     Serial1 TX1      |     5     |   5/D6  |  26/D3|     X      |  tx1  |
+ *     TX     |              RX                |     Serial1 RX1      |     4     |   4/D7  |  25/D2|     X      |  rx1  |
  * ----------------------------------------------------------------------------------------------------------------------*/
   #if defined(ARDUINO_AVR_UNO)||defined(ESP8266)
   #include <SoftwareSerial.h>
@@ -51,18 +50,24 @@ const uint8_t ADDR = 0x47;
 #elif defined(BMP5_COMM_I2C)
   DFRobot_BMP58X_I2C bmp58x(&Wire, ADDR);
 #elif defined(BMP5_COMM_SPI)
-  DFRobot_BMP58X_SPI bmp58x(&SPI, D3);
+  #if defined(ESP32)
+    DFRobot_BMP58X_SPI bmp58x(&SPI, 26 /*D3*/);
+  #elif defined(ARDUINO_BBC_MICROBIT_V2)
+    DFRobot_BMP58X_SPI bmp58x(&SPI, 16);
+  #else 
+    DFRobot_BMP58X_SPI bmp58x(&SPI, 5);
+  #endif
 #else
   #error
 #endif
 
 void setup() {
-  Serial.begin(9600);
+  Serial.begin(115200);
   while(!bmp58x.begin()){
     Serial.println("Sensor init fail!");
     delay(1000);
   }
-
+  Serial.println("Sensor init success!");
   #if defined(CALIBRATE_ABSOLUTE_DIFFERENCE)
   /**
    * Calibrate the sensor according to the current altitude

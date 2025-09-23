@@ -30,8 +30,9 @@ getFIFOData KEYWORD2
 configInterrupt KEYWORD2
 setIntSource KEYWORD2
 getIntStatus KEYWORD2
-setOORPress KEYWORD2
+setPressOOR KEYWORD2
 calibratedAbsoluteDifference KEYWORD2
+setBaud KEYWORD2
 
 #######################################
 # Instances (KEYWORD2)
@@ -45,7 +46,7 @@ calibratedAbsoluteDifference KEYWORD2
 eIntDataReady LITERAL1
 eIntFIFOFull LITERAL1
 eIntFIFOThres LITERAL1
-eIntPressureOor LITERAL1
+eIntPressureOOR LITERAL1
 
 eIntDisable LITERAL1
 eIntEnable LITERAL1
@@ -62,7 +63,7 @@ eIntModeLatched LITERAL1
 eIntStatusDataReady LITERAL1
 eIntStatusFIFOFull LITERAL1
 eIntStatusFIFOThres LITERAL1
-eIntStatusPressureOor LITERAL1
+eIntStatusPressureOOR LITERAL1
 eIntStatusResetComplete LITERAL1
 
 eFIFOOverwriteMode LITERAL1
