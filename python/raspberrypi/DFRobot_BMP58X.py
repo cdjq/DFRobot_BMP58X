@@ -746,16 +746,16 @@ class DFRobot_BMP58X(object):
             @brief  Set the out of range_val pressure of the sensor.
             @param  oor: Out of range_val pressure.
             @n      0x00000 - 0x1FFFF: Out of range_val pressure
-            @param  range_val: Out of range_val pressure range_val.
-            @n      0x00 - 0xFF: Out of range_val pressure range_val  (oor - range_val, oor + range_val)
-            @param  cnt_lim: Out of range_val pressure count limit.
+            @param  range_val: Out of range pressure range_val.
+            @n      0x00 - 0xFF: Out of range pressure range_val  (oor - range_val, oor + range_val)
+            @param  cnt_lim: Out of range pressure count limit.
             @n      OOR_COUNT_LIMIT_1  = 0x00
             @n      OOR_COUNT_LIMIT_3  = 0x01
             @n      OOR_COUNT_LIMIT_7  = 0x02
             @n      OOR_COUNT_LIMIT_15 = 0x03
             @return True if configuration is successful, False otherwise.
         '''
-        if oor not in range_val(0x00000, 0x1FFFF + 1):
+        if oor not in range(0x00000, 0x1FFFF + 1):
             return False
         if range_val not in range(0x00, 0xFF + 1):
             return False
@@ -771,7 +771,7 @@ class DFRobot_BMP58X(object):
                            self.OOR_THR_P_16_WIDTH, (oor >> 16) & 0x01)
 
         data[2] = range_val
-        dataself._REG_SET_BITS(data[3], self.CNT_LIM_POS,
+        data[3] = self._REG_SET_BITS(data[3], self.CNT_LIM_POS,
                            self.CNT_LIM_WIDTH, cnt_lim)
         self._write_holding_reg(self.REG_H_OOR_THR_P_LSB, data)
         if currMode not in (self.DEEP_SLEEP_MODE, self.SLEEP_MODE):
