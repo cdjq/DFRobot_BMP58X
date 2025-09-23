@@ -467,7 +467,7 @@ class DFRobot_BMP58X(object):
 
         intStatus = self.get_int_status()
         if intStatus & self.INT_STATUS_POR_SOFTRESET_COMPLETE:
-            return True
+            return self._enable_pressure(self.ENABLE)
         return False
 
     def read_temperature(self):
@@ -771,7 +771,7 @@ class DFRobot_BMP58X(object):
                            self.OOR_THR_P_16_WIDTH, (oor >> 16) & 0x01)
 
         data[2] = range_val
-        data[3] = self._REG_SET_BITS(data[3], self.CNT_LIM_POS,
+        dataself._REG_SET_BITS(data[3], self.CNT_LIM_POS,
                            self.CNT_LIM_WIDTH, cnt_lim)
         self._write_holding_reg(self.REG_H_OOR_THR_P_LSB, data)
         if currMode not in (self.DEEP_SLEEP_MODE, self.SLEEP_MODE):
