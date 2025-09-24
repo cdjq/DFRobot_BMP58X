@@ -42,6 +42,7 @@ const uint8_t ADDR = 0x47;
 
 void setup() {
   Serial.begin(115200);
+  delay(3000);
   while(!bmp58x.begin()){
     Serial.println("Sensor init fail!");
     delay(1000);

@@ -69,7 +69,12 @@ DFRobot_BMP58X_I2C bmp58x(&Wire, ADDR);
 #endif
 
 volatile uint8_t flag = 0;
-void interrupt() {
+#if defined(ESP8266)
+void IRAM_ATTR interrupt()
+#else
+void interrupt()
+#endif
+{
   if (flag == 0) {
     flag = 1;
   }
@@ -125,12 +130,23 @@ void setup() {
     bmp58x.calibratedAbsoluteDifference(540.0);
   #endif
 
-#if defined(ESP32) || defined(ESP8266)
+#if defined(ESP32)
   // D6 pin is used as interrupt pin by default, other non-conflicting pins can also be selected as external interrupt pins.
-  attachInterrupt(digitalPinToInterrupt(D6) /* Query the interrupt number of the D6 pin */, interrupt, RISING);
+  attachInterrupt(digitalPinToInterrupt(14 /*D6*/) /* Query the interrupt number of the D6 pin */, interrupt, RISING);
+#elif defined(ESP8266)
+  #if defined (BMP5_COMM_UART)
+  const uint8_t interruptPin = 12;
+  #elif defined (BMP5_COMM_I2C)
+  const uint8_t interruptPin = 13;
+  #elif defined (BMP5_COMM_SPI)
+  const uint8_t interruptPin = 4;
+  #else
+  #error
+  #endif
+  attachInterrupt(digitalPinToInterrupt(interruptPin) , interrupt, RISING);
 #elif defined(ARDUINO_SAM_ZERO)
-  // Pin 5 is used as interrupt pin by default, other non-conflicting pins can also be selected as external interrupt pins
-  attachInterrupt(digitalPinToInterrupt(5) /* Query the interrupt number of the 5 pin */, interrupt, RISING);
+  // Pin 6 is used as interrupt pin by default, other non-conflicting pins can also be selected as external interrupt pins
+  attachInterrupt(digitalPinToInterrupt(6) /* Query the interrupt number of the 6 pin */, interrupt, RISING);
 #else
   /* The Correspondence Table of AVR Series Arduino Interrupt Pins And Terminal Numbers
      * ---------------------------------------------------------------------------------------
