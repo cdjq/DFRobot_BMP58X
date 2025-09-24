@@ -1035,7 +1035,12 @@ class DFRobot_BMP58X_SPI(DFRobot_BMP58X):
         return rslt
 
     def _write_holding_reg(self, reg, data):
-        self._write_reg(reg, data)
+        if isinstance(data, int):
+            data = [data]
+        idx = 0
+        for val in data:
+            self._write_reg(reg + idx, val)
+            idx += 1
 
     def _read_input_reg(self, reg, size):
         return self._read_reg(reg, size)
