@@ -408,7 +408,15 @@ bool DFRobot_BMP58X_I2C::begin(void) {
   _pWire->begin();
   return DFRobot_BMP58X::begin();
 }
-uint8_t DFRobot_BMP58X_SPI::writeHoldingReg(uint8_t reg, void *data, uint8_t len) { return writeReg(reg, data, len) ? RET_CODE_OK : RET_CODE_ERROR; }
+uint8_t DFRobot_BMP58X_SPI::writeHoldingReg(uint8_t reg, void *data, uint8_t len) {
+  uint16_t *tempData = static_cast<uint16_t *>(data);
+  uint8_t ret = RET_CODE_OK, i = 0;
+  while(ret && i < len){
+    ret = writeReg(reg+i, &tempData[i], 1);
+    ++i;
+  }
+  return ret; 
+}
 uint8_t DFRobot_BMP58X_SPI::readHoldingReg(uint8_t reg, void *data, uint8_t len) { return readReg(reg, data, len) ? RET_CODE_OK : RET_CODE_ERROR; }
 uint8_t DFRobot_BMP58X_SPI::readInputReg(uint8_t reg, void *data, uint8_t len) { return readReg(reg, data, len) ? RET_CODE_OK : RET_CODE_ERROR; }
 bool DFRobot_BMP58X_SPI::readReg(uint8_t reg, void *data, uint8_t len) {
