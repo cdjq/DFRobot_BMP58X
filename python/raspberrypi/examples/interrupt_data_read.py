@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*
 '''!
-  @file  interrupt_data_drdy.py
+  @file  interrupt_data_read.py
   @brief  Get the temperature and pressure data of the BMP58X through interrupts
   @details  Obtain BMP58X data by using data in  ready interrupt.
   @copyright   Copyright (c) 2025 DFRobot Co.Ltd (http://www.dfrobot.com)
@@ -51,7 +51,7 @@ def drdy_callback(channel):
 gpio_interrupt = 27
 GPIO.setwarnings(False)
 GPIO.setmode(GPIO.BCM)
-GPIO.setup(gpio_interrupt, GPIO.IN)
+GPIO.setup(gpio_interrupt, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
 GPIO.add_event_detect(gpio_interrupt, GPIO.RISING, callback=drdy_callback)
 
 def setup():

@@ -147,6 +147,15 @@ uint8_t DFRobot_BMP58X::configIIR(eIIRFilter_t iirTemp, eIIRFilter_t iirPress) {
 }
 
 uint8_t DFRobot_BMP58X::configFIFO(eFIFODataSel_t dataSel, eFIFODownSampling_t downSampling, eFIFOWorkMode_t mode, uint8_t threshold) {
+  if (dataSel == eFIFOTempData || dataSel == eFIFOPressData) {
+    if (threshold > 0x1F) {
+      return RET_CODE_ERROR;
+    }
+  } else if (dataSel == eFIFOPressAndTempData) {
+    if (threshold > 0x0F) {
+      return RET_CODE_ERROR;
+    }
+  }
   eMeasureMode_t currMode = getPowerMode();
   setMeasureMode(eSleep);
   uint16_t data = 0;
@@ -233,7 +242,9 @@ uint8_t DFRobot_BMP58X::configInterrupt(eIntMode_t mode, eIntPolarity_t pol, eIn
 
 uint8_t DFRobot_BMP58X::setIntSource(uint8_t source) {
   const uint8_t VALID_INT_MASK = eIntDataReady | eIntFIFOFull | eIntFIFOThres | eIntPressureOOR;
-  // source &= VALID_INT_MASK;
+  if (source & ~VALID_INT_MASK) {
+    return RET_CODE_ERROR;
+  }
   uint16_t data = ((uint8_t)source & VALID_INT_MASK);
   writeHoldingReg(REG_H_INT_SOURCE, &data, 1);
   return RET_CODE_OK;
@@ -242,8 +253,6 @@ uint8_t DFRobot_BMP58X::setIntSource(uint8_t source) {
 uint16_t DFRobot_BMP58X::getIntStatus(void) {
   uint16_t data = 0;
   readInputReg(REG_I_INT_STATUS, &data, 1);
-  // DBG(REG_I_INT_STATUS);
-  // DBG(data);
   return data;
 }
 

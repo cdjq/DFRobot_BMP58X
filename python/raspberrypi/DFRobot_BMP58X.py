@@ -593,6 +593,12 @@ class DFRobot_BMP58X(object):
             return False
         if mode not in (self.FIFO_STREAM_TO_FIFO_MODE, self.FIFO_STOP_ON_FULL_MODE):
             return False
+        if frame_sel == self.FIFO_TEMPERATURE_DATA or frame_sel == self.FIFO_PRESSURE_DATA:
+            if threshold > 0x1F:
+                return False
+        elif frame_sel == self.FIFO_PRESS_TEMP_DATA:
+            if threshold > 0x0F:
+                return False
         currMode = self._get_power_mode()
         self.set_measure_mode(self.SLEEP_MODE)
         data = self._read_holding_reg(self.REG_H_DSP_CONFIG, 1)

@@ -4,11 +4,34 @@
 
 这是一个BMP58X的库，功能是读取温度和压力。BMP(585/581)是一款基于可靠传感原理的压力和温度测量数字传感器。
 
-![正反面svg效果图]()
+### SEN0664
+<p align="center">
+  <img src="./resources/images/SEN0664 (3).png" width="45%">
+  <img src="./resources/images/SEN0664 (4).png" width="45%">
+</p>
+
+### SEN0665
+<p align="center">
+  <img src="./resources/images/SEN0665 (1).png" width="45%">
+  <img src="./resources/images/SEN0665 (2).png" width="45%">
+</p>
+
+### SEN0666
+<p align="center">
+  <img src="./resources/images/SEN0666 (3).png" width="45%">
+  <img src="./resources/images/SEN0666 (4).png" width="45%">
+</p>
+
+### SEN0667
+<p align="center">
+  <img src="./resources/images/SEN0667 (1).png" width="45%">
+  <img src="./resources/images/SEN0667 (2).png" width="45%">
+</p>
 
 
-## 产品链接（链接到英文商城）
-   
+## 产品链接(https://www.dfrobot.com)
+    SKU: SEN0664/SEN0665/SEN0666/SEN0667
+
 ## 目录
 
 * [概述](#概述)
@@ -33,7 +56,7 @@
 
 ## 库安装
 
-使用此库前，请首先下载库文件，将其粘贴到\Arduino\libraries目录中，然后打开examples文件夹并在该文件夹中运行演示。
+使用此库前，请首先安装依赖库 DFRobot_RTU，让后再下载库文件，将其粘贴到\Arduino\libraries目录中，然后打开examples文件夹并在该文件夹中运行演示。
 
 ## 方法
 
@@ -324,13 +347,13 @@ void setBaud(eBaud baud);
 
 | MCU                | 运行良好 | 运行异常 | 未测试 | 备注 |
 | ------------------ |:---------:|:----------:|:--------:| ------- |
-| Arduino uno        |          |            |          |         |
-| FireBeetle esp32   |          |            |          |         |
-| FireBeetle esp8266 |          |            |          |         |
-| FireBeetle m0      |          |            |          |         |
-| Leonardo           |          |            |          |         |
-| Microbit           |          |            |          |         |
-| Arduino MEGA2560   |          |            |          |         |
+| Arduino uno        |     √     |            |          |         |
+| FireBeetle esp32   |     √     |            |          |         |
+| FireBeetle esp8266 |     √     |            |          |         |
+| FireBeetle m0      |     √     |            |          |         |
+| Leonardo           |     √     |            |          |         |
+| Microbit           |     √     |            |          |         |
+| Arduino MEGA2560   |     √     |            |          |         |
 
 ## 历史
 

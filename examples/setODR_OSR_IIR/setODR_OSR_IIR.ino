@@ -123,7 +123,7 @@ void setup() {
    */
 
   bmp58x.setODR(bmp58x.eOdr5Hz);
-  bmp58x.setOSR(bmp58x.eOverSampling16, bmp58x.eOverSampling16);
+  bmp58x.setOSR(/* osrTemp= */ bmp58x.eOverSampling16, /* osrPress= */ bmp58x.eOverSampling16);
 
   /**
    * @param iirTemp  Temperature IIR filter (see: eIIRFilter_t)
@@ -138,8 +138,7 @@ void setup() {
    * @n - eFilter63:       63rd order filter
    * @n - eFilter127:      127th order filter
    */
-  bmp58x.configIIR(bmp58x.eFilter15, bmp58x.eFilter15);
-
+  bmp58x.configIIR(/* iirTemp= */bmp58x.eFilter15, /* iirPress= */bmp58x.eFilter15);
 
   /**
    * @param intMode Trigger mode (see: eIntMode_t)

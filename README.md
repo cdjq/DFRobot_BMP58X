@@ -1,15 +1,36 @@
-# DFRobot_RTU
+# DFRobot_BMP58X
 
-* [English Version](./README_CN.md)
+* [中文版](./README_CN.md)
 
 This is a library for BMP58X, which reads temperature and pressure. BMP(585/581) is a digital sensor for pressure and temperature measurement based on reliable sensing principles.
 
-![正反面svg效果图]
+### SEN0664
+<p align="center">
+  <img src="./resources/images/SEN0664 (3).png" width="45%">
+  <img src="./resources/images/SEN0664 (4).png" width="45%">
+</p>
 
+### SEN0665
+<p align="center">
+  <img src="./resources/images/SEN0665 (1).png" width="45%">
+  <img src="./resources/images/SEN0665 (2).png" width="45%">
+</p>
 
-## Product Link（链接到英文商城）
-    
-   
+### SEN0666
+<p align="center">
+  <img src="./resources/images/SEN0666 (3).png" width="45%">
+  <img src="./resources/images/SEN0666 (4).png" width="45%">
+</p>
+
+### SEN0667
+<p align="center">
+  <img src="./resources/images/SEN0667 (1).png" width="45%">
+  <img src="./resources/images/SEN0667 (2).png" width="45%">
+</p>
+
+## Product Link(https://www.dfrobot.com)
+    SKU: SEN0664/SEN0665/SEN0666/SEN0667
+
 ## Table of Contents
 
 * [Summary](#summary)
@@ -33,7 +54,7 @@ This is a library for BMP58X, which reads temperature and pressure. BMP(585/581)
 
 ## Installation
 
-To use this library, first download the library file, paste it into the \Arduino\libraries directory, then open the examples folder and run the demo in the folder.
+Before using this library, first install the dependency library DFRobot_RTU. Then, download the library files, paste them into the \Arduino\libraries directory, and open the examples folder to run the demonstration.
 
 ## Methods
 
@@ -330,13 +351,13 @@ void setBaud(eBaud baud);
 
 | MCU                | Work Well | Work Wrong | Untested | Remarks |
 | ------------------ |:---------:|:----------:|:--------:| ------- |
-| Arduino uno        |          |            |          |         |
-| FireBeetle esp32   |          |            |          |         |
-| FireBeetle esp8266 |          |            |          |         |
-| FireBeetle m0      |          |            |          |         |
-| Leonardo           |          |            |          |         |
-| Microbit           |          |            |          |         |
-| Arduino MEGA2560   |          |            |          |         |
+| Arduino uno        |     √     |            |          |         |
+| FireBeetle esp32   |     √     |            |          |         |
+| FireBeetle esp8266 |     √     |            |          |         |
+| FireBeetle m0      |     √     |            |          |         |
+| Leonardo           |     √     |            |          |         |
+| Microbit           |     √     |            |          |         |
+| Arduino MEGA2560   |     √     |            |          |         |
 
 
 ## History

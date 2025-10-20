@@ -54,7 +54,7 @@ def int_callback(channel):
 gpio_interrupt = 27
 GPIO.setwarnings(False)
 GPIO.setmode(GPIO.BCM)
-GPIO.setup(gpio_interrupt, GPIO.IN)
+GPIO.setup(gpio_interrupt, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
 GPIO.add_event_detect(gpio_interrupt, GPIO.RISING, callback=int_callback)
 
 def setup():

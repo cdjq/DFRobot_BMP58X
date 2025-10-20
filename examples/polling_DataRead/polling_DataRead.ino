@@ -1,5 +1,5 @@
 /**
- * @file  getTempPress.ino
+ * @file  polling_DataRead.ino
  * @brief  Get the temperature and pressure data of the BMP58X
  * @details  The temperature and pressure data of the BMP58X is obtained by calling the readPressPa and readTempC functions respectively.
  * @n  The altitude data is obtained by calling the get_altitude() function.

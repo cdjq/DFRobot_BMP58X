@@ -220,7 +220,7 @@ void setup() {
 }
 void loop() {
   if (flag == 1) {
-    if(bmp58x.getIntStatus() & (bmp58x.eIntFIFOThres | bmp58x.eIntFIFOFull)){
+    if(bmp58x.getIntStatus() & (bmp58x.eIntFIFOThres)){
       DFRobot_BMP58X::sFIFOData_t data;
       data = bmp58x.getFIFOData();
       Serial.print("FIFO len: ");

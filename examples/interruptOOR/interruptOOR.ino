@@ -51,7 +51,7 @@ const uint8_t ADDR = 0x47;
 SoftwareSerial mySerial(/*rx =*/4, /*tx =*/5);
 DFRobot_BMP58X_UART bmp58x(&mySerial, 9600, ADDR);
 #elif defined(ESP32)
-DFRobot_BMP58X_UART bmp58x(&Serial1, 9600, ADDR, /*rx*/ D2, /*tx*/ D3);
+DFRobot_BMP58X_UART bmp58x(&Serial1, 9600, ADDR, /*rx D2*/ 25, /*tx D3*/ 26);
 #else
 DFRobot_BMP58X_UART bmp58x(&Serial1, 9600, ADDR);
 #endif
